@@ -1,0 +1,213 @@
+---
+# tasks file for ./roles/postgreSQL
+
+- name: postgresql installation
+  become: true
+  ansible.builtin.apt:
+    name: "{{installation_elements}}"
+      # - postgresql
+      # - postgresql-contrib
+      # - python3-psycopg2
+    state: present
+  
+
+- name: Find the PostgreSQL main directory
+  become: true
+  become_user: root
+  find:
+    paths: /etc/postgresql/
+    patterns: pg_hba.conf
+    recurse: yes
+  register: pg_hba_file
+
+# - name: Copy pg_hba.conf file to the correct directory
+#   become: true
+#   become_user: root
+#   copy:
+#     src: pg_hba.conf
+#     dest: "{{ item.path }}"
+#     owner: postgres
+#     group: postgres
+#     mode: '0640'
+#   loop: "{{ pg_hba_file.files }}"
+#   notify: Restart tasks 
+
+- name: modify connection_method to "trust"
+  become: true
+  become_user: root
+  ansible.builtin.template:
+    src: pg_hba.conf.j2
+    dest: "{{ item.path }}"
+    owner: postgres
+    group: postgres
+    mode: '0640'
+  loop: "{{ pg_hba_file.files }}"
+  notify: Restart tasks 
+
+
+
+
+# - name: copy db script file
+#   become: true
+#   copy:
+#     src: "./db_script.sh"
+#     dest: /tmp/db_script.sh
+#     mode: 0777
+
+# - name: create user and daatabase
+#   become: true
+#   shell: /tmp/db_script.sh
+#   notify: Restart tasks
+
+- name: Restart tasks
+  become: true
+  service:
+    name: "{{ postgresql }}"
+    state: restarted
+
+
+- name: postgres password modification
+  command: sudo -i -u postgres psql -c "ALTER USER postgres PASSWORD 'your_new_password';"
+
+- name: Create a new database with name "roberto" 
+  community.postgresql.postgresql_db:
+    name: roberto_db
+    encoding: UTF-8
+    # lc_collate: de_DE.UTF-8
+    # lc_ctype: de_DE.UTF-8
+    # locale_provider: icu
+    # icu_locale: de-DE-x-icu
+    template: template0
+    login_user: postgres
+    login_password: ""
+  notify: Restart tasks 
+
+
+- name: Connect to roberto_db database and create roberto user
+  community.postgresql.postgresql_user:
+    name: roberto_user
+    password: 'roberto_password'
+    db: roberto_db
+    priv: "ALL"
+    state: present
+    login_user: postgres
+    login_password: 'your_new_password'
+  notify: Restart tasks
+
+
+# - name: modify connection_method to scram-sha-256
+#   become: true
+#   become_user: root
+#   ansible.builtin.template:
+#     src: pg_hba.conf2.j2
+#     dest: "{{ item.path }}"
+#     owner: postgres
+#     group: postgres
+#     mode: '0640'
+#   loop: "{{ pg_hba_file.files }}"
+#   notify: Restart tasks 
+
+
+
+
+
+
+
+
+
+
+
+
+
+# - name: Set options
+#   community.postgresql.postgresql_set:
+#     name: "{{ item.name }}"
+#     value: "{{ item.value }}"
+#   become: true
+#   become_user: root
+#   with_items: "{{ postgresql_options | default([]) }}"
+#   notify:
+#     - Restart postgresql
+
+# - name: Create the databases
+#   community.postgresql.postgresql_db:
+#     name: "{{ item }}"
+#     encoding: "UTF-8"
+#   become: true
+#   become_user: postgres
+#   with_items: "{{ postgresql_databases }}"
+
+
+# - name: Change /tmp ownership1
+#   ansible.builtin.file:
+#     path: /tmp
+#     # owner: ansible
+#     # group: ansible
+#     mode: '0600'
+
+# - name: Change /tmp ownership2
+#   ansible.builtin.file:
+#     path: /tmp
+#     # owner: ansible
+#     # group: ansible
+#     mode: '0700'
+
+# - name: Create a new database roberto_db1
+#   become: true
+#   postgresql_db:
+#     name: roberto_db
+#     state: present
+#     login_user: postgres
+#     login_password: your_password
+
+
+# - name: Create a new database roberto_db
+#   # become: true
+#   # become_user: postgres
+#   environment:
+#     TMPDIR: /tmp/ansible_tmp
+#   postgresql_db:
+#     name: roberto_db
+#     state: present
+  
+
+
+
+# - name: Create a new database roberto_db using command
+#   become: true
+#   become_user: postgres
+#   command: psql -c "CREATE DATABASE roberto_db;"
+
+
+# - name: Create a new database roberto_db
+#   become: true
+#   become_user: postgres
+#   postgresql_db:
+#     name: roberto_db
+#     state: present
+  
+
+# - name: Create a new user roberto
+#   become: true
+#   become_user: root
+#   postgresql_user:
+#     name: roberto
+#     password: 123456
+#     role_attr_flags: CREATEDB
+#     state: present
+
+
+# - name: Set owner as bob for table acme in database bar
+#   postgresql_owner:
+#     db: roberto_db
+#     new_owner: bob
+#     obj_name: acme
+#     obj_type: table
+
+# - name: Connect to acme database, create roberto user, and grant access to database and products table
+#   postgresql_user:
+#     db: acme
+#     name: roberto
+#     password: ceec4eif7ya
+#     priv: "CONNECT/products:ALL"
+#     expires: "Jan 31 2020"

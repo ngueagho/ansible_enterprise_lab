@@ -1,0 +1,19 @@
+---
+# vars file for ./roles/postgreSQL
+
+installation_elements:
+  - postgresql
+  - python3-psycopg2
+  - postgresql-contrib
+
+
+postgresql: "postgresql"
+
+connection_method1: "peer"
+connection_method2: "trust"
+connection_method3: "md5"
+connection_method4: "scram-sha-256"
+
+
+
+

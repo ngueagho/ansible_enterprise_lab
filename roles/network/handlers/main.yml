@@ -1,0 +1,10 @@
+---
+# handlers file for network
+
+
+# Restart systemd to apply changes
+- name: restart-task
+  ansible.builtin.systemd:
+    name: systemd.service
+    state: restarted
+    daemon_reload: true

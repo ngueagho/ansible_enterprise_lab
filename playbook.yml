@@ -1,0 +1,82 @@
+---
+# - name: My first play
+#   hosts: nginx
+#   gather_facts: false
+#   become: true
+#   pre_tasks:
+#     - name: Fix broken dependencies
+#       ansible.builtin.shell: apt --fix-broken install -y
+#       become: yes
+#     - name: Update all packages
+#       apt:
+#         name: '*'
+#         state: latest
+
+#     - name: Update apt cache
+#       apt:
+#         update_cache: yes
+#         cache_valid_time: 3600
+#   tasks:
+#    - name: Print message
+#      ansible.builtin.debug:
+#       msg: ROBERTO CONFIGS
+#   roles:
+#     # - roles/nginx
+#     # - roles/postgreSQL
+#     # - roles/MongoDB
+#     # - roles/ceph
+#     - roles/network
+
+
+
+
+
+
+
+
+# - name: My second play
+#   hosts: apache2
+#   gather_facts: false
+#   become: true
+#   pre_tasks:
+#     - name: Update all packages
+#       apt:
+#         name: '*'
+#         state: latest
+
+#     - name: Update apt cache
+#       apt:
+#         update_cache: yes
+#         cache_valid_time: 3600
+#   tasks:
+#    - name: Print message
+#      ansible.builtin.debug:
+#       msg: ROBERTO CONFIGS APACHE2
+#   roles:
+#     - roles/apache2
+
+
+
+- name: My third play
+  hosts: worketyamo
+  gather_facts: false
+  become: true
+  pre_tasks:
+    - name: Fix broken dependencies
+      ansible.builtin.shell: apt --fix-broken install -y
+      become: yes
+    - name: Update all packages
+      apt:
+        name: '*'
+        state: latest
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+  tasks:
+   - name: Print message
+     ansible.builtin.debug:
+      msg: ROBERTO CONFIGS NETWORK
+  roles:
+    - roles/network

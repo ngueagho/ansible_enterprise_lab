@@ -1,0 +1,64 @@
+---
+# tasks file for nginx
+
+# install nginx
+- name: Install nginx
+  apt:
+    name: "{{installation_elements}}"
+    state: present
+
+# #start nginx and enable the service 
+- name: start nginx and enable the service 
+  ansible.builtin.service:
+    name: nginx 
+    enabled: true
+    state: started
+
+
+
+- name: Clone website repositories
+  ansible.builtin.git:
+    repo: "{{ item.url }}"
+    dest: "/var/www/{{ item.domain_name }}"
+  loop: "{{ github_projects }}"
+
+
+# creation of {{sites}}.propentatech.com files 
+- name: copy .propentatech.com files 
+  ansible.builtin.template:
+    src: propentatech.com.conf.j2
+    dest: /etc/nginx/sites-available/{{ item.domain_name }}.propentatech.com.conf
+  loop: "{{ github_projects }}"
+  loop_control:
+    loop_var: item
+
+
+- name: Remove existing nginx site links
+  file:
+    path: /etc/nginx/sites-enabled/{{ item.domain_name }}.propentatech.com.conf
+    state: absent
+  loop:
+    - { domain_name: 'nd-myrice', url: 'https://github.com/Myrice237/porfulio.git' }
+    - { domain_name: 'josee', url: 'https://github.com/JoseeNana/porfulio.git' }
+
+- name: Create nginx site links
+  file:
+    src: /etc/nginx/sites-available/{{ item.domain_name }}.propentatech.com.conf
+    dest: /etc/nginx/sites-enabled/{{ item.domain_name }}.propentatech.com.conf
+    state: link
+  loop:
+    - { domain_name: 'nd-myrice', url: 'https://github.com/Myrice237/porfulio.git' }
+    - { domain_name: 'josee', url: 'https://github.com/JoseeNana/porfulio.git' }
+
+- name: enabled nginx proxi 
+  command: "{{ item }}"
+  loop: "{{ enabled_commands }}"
+  register: enable_output
+  notify: Restart nginx
+
+
+
+
+
+
+# /usr/share/nginx/html/index.html

@@ -1,0 +1,13 @@
+---
+# handlers file for roles/MongoDB
+
+- name: start mongodb
+  service:
+    name: mongodb
+    state: started
+
+
+- name: restart mongodb
+  service:
+    name: mongodb
+    state: restarted

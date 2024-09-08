@@ -1,0 +1,14 @@
+---
+# handlers file for ./roles/apache2
+- name: started tasks
+  ansible.builtin.service:
+    name: apache2
+    state: started
+    enabled: true
+  
+- name: restart apache2
+  ansible.builtin.service:
+    name: apache2
+    state: restarted
+    enabled: false
+

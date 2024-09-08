@@ -1,0 +1,15 @@
+---
+# tasks file for network
+- name: netplan installation
+  ansible.builtin.apt:
+    name:
+      - netplan.io
+    state: present
+
+- name:  started task
+  ansible.builtin.systemd:
+    name: netplan.service
+    enabled: true
+    state: started
+  notify: restart-task
+

@@ -1,0 +1,5 @@
+---
+# defaults file for nginx
+nd_myrice:  https://github.com/Myrice237/porfulio.git
+josee:      https://github.com/JoseeNana/porfulio.git
+nginx: nginx

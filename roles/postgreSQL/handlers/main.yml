@@ -1,0 +1,14 @@
+---
+# handlers file for ./roles/postgreSQL
+
+- name: started tasks
+  become: true
+  service:
+    name: "{{ postgresql }}"
+    state: started
+
+- name: Restart tasks
+  become: true
+  service:
+    name: "{{ postgresql }}"
+    state: restarted

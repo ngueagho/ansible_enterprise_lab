@@ -1,0 +1,56 @@
+---
+# tasks file for roles/MongoDB
+
+# - name: install usefull packages 
+#   become: true
+#   package:
+#     name: "{{ item }}"
+#     state: present
+#   loop: "{{ packages }}"
+
+# - name: Install MongoDB packages
+#   become: true
+#   command : "{{ item }}"
+#   loop: "{{ Install_commands }}"
+
+
+
+
+- name: Add MongoDB GPG key
+  ansible.builtin.apt_key:
+    url: https://www.mongodb.org/static/pgp/server-6.0.asc
+    state: present
+
+- name: Add MongoDB repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64,arm64] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse"
+    filename: mongodb-org-6.0.list
+
+- name: Update APT package list
+  ansible.builtin.apt:
+    update_cache: yes
+
+
+- name: Install MongoDB server
+  become: true
+  ansible.builtin.command: |
+    -  sudo apt install mongodb-database-tools --fix-broken install
+    -  sudo apt install mongodb-org-tools --fix-broken install
+
+
+
+
+# - name: mongodb_installation 
+#   ansible.builtin.apt:
+#     name: 
+#     - mongodb-server-core
+#     state: absent
+#   notify: start mongodb
+
+
+- name: mongodb_config
+  template:
+    src: mongodb.conf.j2
+    dest: /etc/mongod.conf
+  notify: restart mongodb
+

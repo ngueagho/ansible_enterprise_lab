@@ -1,0 +1,15 @@
+<VirtualHost *:80>
+    ServerName {{ item.domain_name }}.propentatech.com
+    ServerAlias www.{{ item.domain_name }}.propentatech.com
+    ServerAdmin webmaster@{{ item.domain_name }}.propentatech.com
+    DocumentRoot /var/www/{{ item.domain_name }}
+    
+    <Directory /var/www/{{ item.domain_name }}>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+    
+    ErrorLog ${APACHE_LOG_DIR}/{{ item.domain_name }}_error.log
+    CustomLog ${APACHE_LOG_DIR}/{{ item.domain_name }}_access.log combined
+</VirtualHost>

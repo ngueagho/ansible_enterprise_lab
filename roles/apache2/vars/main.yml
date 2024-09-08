@@ -1,0 +1,17 @@
+---
+# vars file for ./roles/apache2
+
+github_projects:
+  - { domain_name : "nd-myrice" , url: "https://github.com/Myrice237/porfulio.git"} 
+  - { domain_name : "josee" , url: "https://github.com/JoseeNana/porfulio.git"}
+
+
+installation_elements: 
+  - apache2
+  - git 
+
+enabled_commands:
+  - sudo a2enmod proxy
+  - sudo a2enmod proxy_http
+  # - sudo a2ensite /etc/apache2/sites-available/"{{ github_projects.domain_name }}".propentatech.com
+  - sudo a2dissite 000-default.conf

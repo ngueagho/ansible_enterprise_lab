@@ -1,0 +1,15 @@
+---
+# vars file for nginx
+
+github_projects:
+  - { domain_name : "nd-myrice" , url: "https://github.com/Myrice237/porfulio.git"} 
+  - { domain_name : "josee" , url: "https://github.com/JoseeNana/porfulio.git"}
+
+
+installation_elements: 
+  - nginx
+  - git 
+
+
+enabled_commands:
+  - sudo nginx -t

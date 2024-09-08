@@ -1,0 +1,41 @@
+---
+# tasks file for ./roles/apache2
+- name: installation of apache2
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ installation_elements }}"
+  notify: started tasks
+
+
+
+- name: Clone repositories
+  ansible.builtin.git:
+    repo: "{{ item.url }}"
+    dest: "/var/www/{{ item.domain_name }}"
+  loop: "{{ github_projects }}"
+
+
+# creation of {{sites}}.propentatech.com files 
+- name: copy .propentatech.com files 
+  ansible.builtin.template:
+    src: propentatech.com.conf.j2
+    dest: /etc/apache2/sites-available/{{ item.domain_name }}.propentatech.com.conf
+  loop: "{{ github_projects }}"
+  loop_control:
+    loop_var: item
+
+
+- name: enabled apachee proxi 
+  command: "{{ item }}"
+  loop: "{{ enabled_commands }}"
+
+
+- name: Enable Apache modules and site configuration
+  command: sudo a2ensite {{ item.domain_name }}.propentatech.com.conf
+  loop: "{{ github_projects }}"
+  notify: restart apache2
+
+
+
+
