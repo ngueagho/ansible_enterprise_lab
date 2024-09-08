@@ -1,0 +1,4 @@
+---
+# handlers file for ./roles/nodejs
+- name: Redémarrer l'application Node.js
+  shell: pm2 restart mon-app

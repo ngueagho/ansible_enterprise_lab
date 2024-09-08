@@ -1,0 +1,19 @@
+---
+# tasks file for ./roles/nodejs
+- name: Installer Node.js
+  apt:
+    name: nodejs
+    state: present
+
+- name: Cloner le dépôt de l'application
+  git:
+    repo: "https://github.com/utilisateur/mon-app-nodejs.git"
+    dest: "/var/www/mon-app"
+
+- name: Installer les dépendances
+  npm:
+    path: /var/www/mon-app
+    state: present
+
+- name: Démarrer l'application avec PM2
+  shell: pm2 start /var/www/mon-app/app.js --name "mon-app"
