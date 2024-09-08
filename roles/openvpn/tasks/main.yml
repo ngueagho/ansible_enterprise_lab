@@ -1,0 +1,21 @@
+---
+# tasks file for ./roles/openvpn
+- name: Installer OpenVPN
+  apt:
+    name: openvpn
+    state: present
+
+- name: Générer les certificats et les clés
+  command: ./easy-rsa init-pki
+
+- name: Copier le fichier de configuration OpenVPN
+  template:
+    src: openvpn.conf.j2
+    dest: /etc/openvpn/server.conf
+
+- name: Activer le routage IP
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+    state: present
+    reload: yes

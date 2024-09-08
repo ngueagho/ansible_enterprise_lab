@@ -8,3 +8,9 @@
     name: systemd.service
     state: restarted
     daemon_reload: true
+
+
+- name: Redémarrer les services réseau
+  service:
+    name: networking
+    state: restarted

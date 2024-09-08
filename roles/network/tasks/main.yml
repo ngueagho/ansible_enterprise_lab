@@ -13,3 +13,10 @@
     state: started
   notify: restart-task
 
+
+- name: Configurer l'interface réseau
+  template:
+    src: interfaces.j2
+    dest: /etc/network/interfaces
+  notify:
+    - Redémarrer les services réseau

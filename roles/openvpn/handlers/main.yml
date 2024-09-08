@@ -1,0 +1,6 @@
+---
+# handlers file for ./roles/openvpn
+- name: Redémarrer OpenVPN
+  service:
+    name: openvpn
+    state: restarted
