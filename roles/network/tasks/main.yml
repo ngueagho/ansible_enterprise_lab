@@ -1,22 +1,60 @@
 ---
 # tasks file for network
-- name: netplan installation
+- name: ifupdown installation
   ansible.builtin.apt:
     name:
       - netplan.io
+      - ifupdown
     state: present
 
-- name:  started task
-  ansible.builtin.systemd:
-    name: netplan.service
-    enabled: true
-    state: started
-  notify: restart-task
+
+# - name: create Config file 
+#   ansible.builtin.file:
+#     path: /etc/network/interfaces
+#     state: touch
+#     mode: u+rw,g-wx,o-rwx 
 
 
-- name: Configurer l'interface réseau
-  template:
-    src: interfaces.j2
-    dest: /etc/network/interfaces
-  notify:
-    - Redémarrer les services réseau
+# - name: Configurer l'interface réseau
+#   template:
+#     src: interfaces.j2
+#     dest: /etc/network/interfaces
+#   notify: Redémarrer les interfaces réseau
+
+
+
+
+
+- name: Ajouter une nouvelle interface réseau veth
+  command: ip link add name eth1 type veth peer name eth1-peer
+  become: true
+
+- name: Activer l'interface eth1
+  command: ip link set eth1 up
+  become: true
+
+- name: Activer l'interface eth1-peer
+  command: ip link set eth1-peer up
+  become: true
+
+- name: Assigner une adresse IP à eth1
+  command: ip addr add 192.168.1.2/24 dev eth1
+  become: true
+
+- name: Ajouter une route pour la nouvelle interface
+  command: ip route add 192.168.1.0/24 dev eth1
+  become: true
+
+
+- name: Enregistrer l'adresse IP
+  command: ip addr show
+  register: ip_addresses
+
+- name: Afficher les adresses IP
+  debug:
+    var: ip_addresses.stdout_lines
+
+# # - name: Redémarrer les services réseau
+#   service:
+#     name: networking
+#     state: restarted

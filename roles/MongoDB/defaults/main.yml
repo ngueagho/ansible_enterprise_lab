@@ -1,2 +1,4 @@
 ---
 # defaults file for roles/MongoDB
+mongo_admin_user: "admin"
+mongo_admin_password: "adminPassword"

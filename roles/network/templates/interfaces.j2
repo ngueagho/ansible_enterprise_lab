@@ -1,5 +1,9 @@
+auto lo
+iface lo inet loopback
+
 auto {{ interface_name }}
 iface {{ interface_name }} inet static
   address {{ ip_address }}
   netmask {{ netmask }}
   gateway {{ gateway }}
+  dns-nameservers 8.8.8.8 8.8.4.4

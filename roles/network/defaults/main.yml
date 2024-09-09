@@ -6,6 +6,9 @@ ip_address: 192.168.1.100
 netmask: 255.255.255.0
 gateway: 192.168.1.1
 
+# ip link add yo type dummy
+
+
 # Pour la deuxième interface
 interface_name_2: eth1
 ip_address_2: 192.168.1.101

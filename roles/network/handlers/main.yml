@@ -1,16 +1,7 @@
 ---
 # handlers file for network
-
-
-# Restart systemd to apply changes
-- name: restart-task
-  ansible.builtin.systemd:
-    name: systemd.service
-    state: restarted
-    daemon_reload: true
-
-
-- name: Redémarrer les services réseau
+- name: Redémarrer les interfaces réseau
   service:
     name: networking
     state: restarted
+  become: true

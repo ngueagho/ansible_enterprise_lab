@@ -8,44 +8,36 @@
 #     state: present
 #   loop: "{{ packages }}"
 
-# - name: Install MongoDB packages
-#   become: true
-#   command : "{{ item }}"
-#   loop: "{{ Install_commands }}"
 
 
+# - name: Add MongoDB GPG key
+#   ansible.builtin.apt_key:
+#     url: https://www.mongodb.org/static/pgp/server-6.0.asc
+#     state: present
 
+# - name: Add MongoDB repository
+#   ansible.builtin.apt_repository:
+#     repo: "deb [arch=amd64,arm64] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse"
+#     filename: mongodb-org-6.0.list
 
-- name: Add MongoDB GPG key
-  ansible.builtin.apt_key:
-    url: https://www.mongodb.org/static/pgp/server-6.0.asc
-    state: present
+# - name: Update APT package list
+#   ansible.builtin.apt:
+#     update_cache: yes
 
-- name: Add MongoDB repository
-  ansible.builtin.apt_repository:
-    repo: "deb [arch=amd64,arm64] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse"
-    filename: mongodb-org-6.0.list
-
-- name: Update APT package list
-  ansible.builtin.apt:
-    update_cache: yes
 
 
 - name: Install MongoDB server
   become: true
-  ansible.builtin.command: |
-    -  sudo apt install mongodb-database-tools --fix-broken install
-    -  sudo apt install mongodb-org-tools --fix-broken install
+  ansible.builtin.apt:
+    name:
+      - mongodb-database-tools
+      - mongodb-org-tools
+    state: present
+    update_cache: yes
+  notify: start mongodb
 
 
 
-
-# - name: mongodb_installation 
-#   ansible.builtin.apt:
-#     name: 
-#     - mongodb-server-core
-#     state: absent
-#   notify: start mongodb
 
 
 - name: mongodb_config
@@ -54,3 +46,29 @@
     dest: /etc/mongod.conf
   notify: restart mongodb
 
+
+# - name: Start MongoDB service
+#   become: true
+#   ansible.builtin.service:
+#     name: mongodb
+#     state: started
+#     enabled: yes
+
+
+
+- name: Install pymongo
+  become: true
+  ansible.builtin.pip:
+    name: pymongo
+
+- name: Create a MongoDB user with readWrite role
+  community.mongodb.mongodb_user:
+    login_user: "{{ mongo_admin_user }}"
+    login_password: "{{ mongo_admin_password }}"
+    database: myDatabase
+    name: myUser
+    password: myPassword
+    roles:
+      - role: readWrite
+        db: myDatabase
+    state: present
