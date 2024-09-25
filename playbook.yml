@@ -1,6 +1,6 @@
 ---
 - name: My first play
-  hosts: nginx
+  hosts: me
   gather_facts: false
   become: true
   # pre_tasks:
@@ -16,14 +16,32 @@
   #     apt:
   #       update_cache: yes
   #       cache_valid_time: 3600
+
+
+
+
+
+  # pre_tasks:
+  # - name: Fix broken dependencies
+  #   ansible.builtin.shell: yum-complete-transaction --cleanup-only
+  #   become: yes
+
+  # - name: Update all packages
+  #   yum:
+  #     name: '*'
+  #     state: latest
+  # - name: Update yum cache
+  #   yum:
+  #     update_cache: yes
+
   tasks:
    - name: Print message
      ansible.builtin.debug:
       msg: ROBERTO CONFIGS
   roles:
-    # - roles/nginx
+    - roles/nginx
     # - roles/postgreSQL
-    - roles/MongoDB
+    # - roles/MongoDB
     # - roles/ceph
     # - roles/nodejs
     # - roles/openvpn

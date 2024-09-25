@@ -6,5 +6,16 @@
     state: restarted
     enabled: false
 
+- name: Reload nginx
+  service:
+    name: nginx
+    state: reloaded
+    enabled: false
 
 
+# #start nginx and enable the service 
+- name: start nginx and enable the service 
+  ansible.builtin.service:
+    name: nginx 
+    enabled: true
+    state: started

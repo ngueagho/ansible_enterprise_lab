@@ -1,25 +1,128 @@
 ---
-# tasks file for nginx
+# we will begin with the update 
 
-# install nginx
-- name: Install nginx
+
+- name: Update APT cache
+  apt:
+    update_cache: yes
+
+
+# install nginx with other useful packages
+- name: Install nginx with other useful packages
   apt:
     name: "{{installation_elements}}"
     state: present
+    update_cache: yes
 
-# #start nginx and enable the service 
-- name: start nginx and enable the service 
+
+
+
+
+
+- name: start certbot
   ansible.builtin.service:
-    name: nginx 
-    enabled: true
+    name: certbot
     state: started
+    enabled: false
+
+
+- name: start nginx
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: false
 
 
 
+
+
+
+#  Obtenir un certificat SSL avec Certbot
+- name: websites securisation
+  become: true
+  ansible.builtin.command: >
+     certbot --nginx -d {{ item.domain_name }}.propentatech.com -d www.{{ item.domain_name }}.propentatech.com --non-interactive --agree-tos --email propentatech@gmail.com --redirect
+  args:
+      creates: /etc/letsencrypt/live/{{ item.domain_name }}.propentatech.com/fullchain.pem
+  loop: "{{ github_projects }}" 
+  notify: Restart nginx
+
+
+
+
+
+# website securisation
+- name: website securisation
+  command: certbot renew --dry-run
+  notify: Restart nginx
+
+
+
+  
+
+
+
+
+
+
+
+
+# create website deployment directory in "/var/www/
+- name: deployment
+  ansible.builtin.file:
+    path: "/var/www/{{ item.domain_name }}"
+    state: directory
+    mode: '0755'
+    owner: www-data
+    group: www-data
+  loop: "{{ github_projects }}"
+
+- name: Ensure /var/www/loading is considered a safe directory for Git
+  command: git config --global --add safe.directory /var/www/loading
+
+
+
+
+
+
+
+- name: Tester la configuration de Nginx
+  command: nginx -t
+  register: nginx_test_result
+  ignore_errors: yes  
+
+- name: Afficher le résultat du test
+  debug:
+    var: nginx_test_result.stdout
+  notify: Reload nginx
+
+
+
+
+
+
+
+
+# clone the website code 
 - name: Clone website repositories
   ansible.builtin.git:
     repo: "{{ item.url }}"
     dest: "/var/www/{{ item.domain_name }}"
+    force: yes
+  loop: "{{ github_projects }}"
+
+
+
+
+
+# changer les permission des nouveaux element copies dans le dossier 
+- name: change website file permissions
+  ansible.builtin.file:
+    path: "/var/www/{{ item.domain_name }}" 
+    owner: www-data
+    group: www-data
+    mode: '0755'
+    recurse: yes
   loop: "{{ github_projects }}"
 
 
@@ -33,32 +136,44 @@
     loop_var: item
 
 
+
+
+
+# enable the website 
 - name: Remove existing nginx site links
   file:
     path: /etc/nginx/sites-enabled/{{ item.domain_name }}.propentatech.com.conf
     state: absent
-  loop:
-    - { domain_name: 'nd-myrice', url: 'https://github.com/Myrice237/porfulio.git' }
-    - { domain_name: 'josee', url: 'https://github.com/JoseeNana/porfulio.git' }
+  loop: "{{ github_projects }}" 
+
+
+
+
 
 - name: Create nginx site links
   file:
     src: /etc/nginx/sites-available/{{ item.domain_name }}.propentatech.com.conf
-    dest: /etc/nginx/sites-enabled/{{ item.domain_name }}.propentatech.com.conf
+    dest: /etc/nginx/sites-enabled/{{ item.domain_name }}.propentatech.com
     state: link
-  loop:
-    - { domain_name: 'nd-myrice', url: 'https://github.com/Myrice237/porfulio.git' }
-    - { domain_name: 'josee', url: 'https://github.com/JoseeNana/porfulio.git' }
-
-- name: enabled nginx proxi 
-  command: "{{ item }}"
-  loop: "{{ enabled_commands }}"
-  register: enable_output
-  notify: Restart nginx
+  loop: "{{ github_projects }}" 
 
 
 
 
 
 
-# /usr/share/nginx/html/index.html
+
+- name: test
+  command: sudo nginx -t
+  register: nginx_test_result
+  ignore_errors: yes  
+
+- name: Afficher le résultat du test
+  debug:
+    var: nginx_test_result.stdout
+  notify: Reload nginx
+
+
+
+
+

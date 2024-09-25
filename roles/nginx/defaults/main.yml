@@ -1,5 +1,20 @@
 ---
 # defaults file for nginx
-nd_myrice:  https://github.com/Myrice237/porfulio.git
-josee:      https://github.com/JoseeNana/porfulio.git
-nginx: nginx
+
+
+
+github_projects:
+  # - { domain_name : "nd-myrice" , url: "https://github.com/Myrice237/porfulio.git"} 
+  # - { domain_name : "josee" , url: "https://github.com/JoseeNana/porfulio.git"}
+  - { domain_name : "loading" , url: "https://github.com/ngueagho/certified-manager.git"}
+
+
+installation_elements: 
+  - nginx
+  - git 
+  - certbot 
+  - python3-certbot-nginx
+
+
+enabled_commands:
+  - sudo nginx -t

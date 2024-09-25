@@ -3,3 +3,5 @@ key2.pem
 roberto.pem
 ansible.cfg
 .vscode
+mykey
+id_ed25519
